@@ -7,8 +7,8 @@
  * @lint-ignore-every XPLATJSCOPYRIGHT1
  */
 
-import React, {Component} from 'react';
-import {View, Button, Image} from 'react-native';
+import React, {Component, Fragment} from 'react';
+import {View, Button, Image, Platform} from 'react-native';
 import ImagePicker from 'react-native-image-picker'
 
 export default class App extends Component {
@@ -49,16 +49,36 @@ export default class App extends Component {
     })
   }
 
+  handleUploadPhoto = () => {
+    fetch('http://localhost:5000/api/upload', {
+      method: 'POST',
+      body: this.createFormData(this.state.photo, { userId: "123" })
+    })
+    .then(res => res.json())
+    .then(res => {
+      console.log("upload succes", res);
+      alert("Upload success!");
+      this.setState({ photo: null });
+    })
+    .catch(error => {
+      console.log("upload error", error);
+      alert("Upload failed!");
+    });
+  }
+
   render() {
     const { photo } = this.state
 
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
         {photo && (
-          <Image
-            source={{ uri: photo.uri }}
-            style={{ width: 300, height: 300 }}
-          />
+          <Fragment>
+            <Image
+              source={{ uri: photo.uri }}
+              style={{ width: 300, height: 300 }}
+            />
+            <Button title="Upload" onPress={this.handleUploadPhoto} />
+          </Fragment>
         )}
         <Button title="Choose Photo" onPress={this.handleChoosePhoto} />
       </View>
